@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 const port = 3031;
@@ -118,7 +117,13 @@ app.post('/', async (req, res) => {
             currentStep = action.actions;
         }
     } else {
-        res.json({ text: "Sorry, I didn't understand that." });
+        if (message === 'help') {
+            currentStep = data[message].actions;
+            res.json(data.help);
+        } else {
+            res.json({ text: "Sorry, I didn't understand that." });
+        }
+
     }
 });
 
