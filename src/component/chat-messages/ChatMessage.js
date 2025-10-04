@@ -2,9 +2,9 @@ import React from 'react';
 
 import './ChatMessage.css';
 
-export const ChatMessage = ({ message }) => {
+export const ChatMessage = React.memo(({ message }) => {
     return (
-        <div className={`chat-message ${message.sender}`}>
+        <div className={`chat-message-${message.sender}`}>
             <div className="message-content">
                 {message.text}
             </div>
@@ -13,4 +13,4 @@ export const ChatMessage = ({ message }) => {
             </div>
         </div>
     );
-};
+});

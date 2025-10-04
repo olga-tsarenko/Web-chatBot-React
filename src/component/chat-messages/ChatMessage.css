@@ -2,6 +2,40 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow-y: auto;
     margin-bottom: 25px;
+}
+
+.chat-message-bot {
+    display: flex;
+    flex-direction: column;
+    padding: 30px 35px;
+    width: 80%;
+    background-color: #ffffff;
+    color: #2f324a;
+    border-radius: 0.75rem 0.75rem 0.75rem 0.125rem;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.chat-message-bot:before {
+    display: inline-block;
+    content: '';
+    width: 60px;
+    height: 60px;
+    background-image: url(/public/images/robot.png);
+    background-size: cover;
+    position: absolute;
+    left: -70px;
+    bottom: 0;
+}
+
+.chat-message-user {
+    width: 40%;
+    align-self: end;
+    padding: 15px 25px;
+    max-width: 100%;
+    background-color: #ffffff;
+    color: #2f324a;
+    margin-bottom: 30px;
+    border-radius: 0.75rem 0.75rem 0.125rem 0.75rem;
 }
