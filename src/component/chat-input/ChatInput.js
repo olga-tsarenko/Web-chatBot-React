@@ -21,19 +21,21 @@ export const ChatInput = ({ onSendMessage }) => {
     };
 
     return (
-        <form className="chat-input-form" onSubmit={handleSubmit}>
-            <input
-                name="message"
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="chat-input"
-            />
-            <button type="submit" className="send-button">
-                Send
-            </button>
-        </form>
+        <div className="chat-footer">
+            <form className="chat-input-form" onSubmit={handleSubmit}>
+                <input
+                    name="message"
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your message..."
+                    className="chat-input"
+                />
+                <button type="submit" className="send-button">
+                    Send
+                </button>
+            </form>
+        </div>
     );
 };

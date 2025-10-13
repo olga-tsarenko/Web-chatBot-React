@@ -49,57 +49,76 @@ async function getWeatherForecast(city) {
 
 const data = {
     help: {
-        text: 'What are you interested in?',
+        text: 'What are you interested in? Current weather or currency rate?',
         actions: {
-            'Currency rate': {
-                text: 'Choose basic currency:',
-                actions: {
-                    'USD': {
-                        text: getExchangeRateToUAH
-                    },
-                    'EUR': {
-                        text: getExchangeRateToUAH
-                    },
-                    'GBP': {
-                        text: getExchangeRateToUAH
-                    }
-                }
+            'currency rate': {
+                text: 'Enter the Currency Name ( USD, EUR, PLN etc):',
+                expectsCurrencyInput: true
             },
-            'Current weather': {
-                text: 'Choose your city:',
-                actions: {
-                    'Kyiv': {
-                        text: getWeatherForecast
-                    },
-                    'Lviv': {
-                        text: getWeatherForecast
-                    },
-                    'Cherkasy': {
-                        text: getWeatherForecast
-                    },
-                    'Odesa': {
-                        text: getWeatherForecast
-                    },
-                    'Dnipro': {
-                        text: getWeatherForecast
-                    }
-                }
+            'current weather': {
+                text: 'Please enter your city name:',
+                expectsCityInput: true // custom flag to indicate next input is a city
             }
         }
     }
 };
 
 let currentStep = data;
+let expectsCityInput = false;
+let expectsCurrencyInput = false;
 
 app.use(express.json());
 app.use(cors());
 
 app.post('/', async (req, res) => {
     const { message } = req.body;
+    const normalizedMessage = message.trim().toLowerCase();
 
-    if (currentStep.hasOwnProperty(message)) {
-        const action = currentStep[message];
-        if (!action.actions) {
+    if (expectsCityInput) {
+        try {
+            const text = await getWeatherForecast(message);
+            res.json({ text: `${text}\n\nThanks, Type 'help' to start again` });
+        } catch (error) {
+            res.json({ text: "An error occurred. Try again." });
+        }
+        expectsCityInput = false;
+        currentStep = data;
+        return;
+    }
+
+    if (expectsCurrencyInput) {
+        try {
+            const text = await getExchangeRateToUAH(message.toUpperCase());
+            res.json({ text: `${text}\n\nThanks, Type 'help' to start again` });
+        } catch (error) {
+            res.json({ text: "An error occurred. Try again." });
+        }
+        expectsCurrencyInput = false;
+        currentStep = data;
+        return;
+    }
+
+    // Normalize keys for comparison
+    const currentStepKeys = Object.keys(currentStep).map(k => k.toLowerCase());
+    let matchedKey = null;
+    for (let i = 0; i < currentStepKeys.length; i++) {
+        if (normalizedMessage === currentStepKeys[i]) {
+            matchedKey = Object.keys(currentStep)[i];
+            break;
+        }
+    }
+
+    if (matchedKey) {
+        const action = currentStep[matchedKey];
+        if (action.expectsCityInput) {
+            expectsCityInput = true;
+            res.json({ text: action.text });
+            currentStep = data;
+        } else if (action.expectsCurrencyInput) {
+            expectsCurrencyInput = true;
+            res.json({ text: action.text });
+            currentStep = data;
+        } else if (!action.actions) {
             if (typeof action.text === 'function') {
                 try {
                     const text = await action.text(message);
@@ -117,13 +136,12 @@ app.post('/', async (req, res) => {
             currentStep = action.actions;
         }
     } else {
-        if (message === 'help') {
-            currentStep = data[message].actions;
+        if (normalizedMessage === 'help') {
+            currentStep = data[normalizedMessage].actions;
             res.json(data.help);
         } else {
             res.json({ text: "Sorry, I didn't understand that." });
         }
-
     }
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ChatInput } from '../chat-input/ChatInput';
 import {ChatMessage} from "../chat-messages/ChatMessage";
 
@@ -9,6 +9,9 @@ export const ChatContainer = () => {
     const [messages, setMessages] = useState([
         { id: 1, text: 'Hello! Type "help" to start.', sender: 'bot' }
     ]);
+
+    const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
 
     const addMessage = async (messageText) => {
         const newMessage = {
@@ -47,12 +50,19 @@ export const ChatContainer = () => {
         }
     };
 
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
+
     return (
         <div className="chat-container">
-            <div className="chat-messages">
-                {messages.map(message => (
+            <div className="chat-messages" ref={messagesContainerRef}>
+                {messages.map((message, idx) => (
                     <ChatMessage key={message.id} message={message} />
                 ))}
+                <div ref={messagesEndRef} />
             </div>
             <ChatInput onSendMessage={addMessage} />
         </div>
